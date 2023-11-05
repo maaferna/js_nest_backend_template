@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// schema.prisma
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String
+  email     String
+  profile   UserProfile?
+  // Add other User fields as needed.
+}
+
+
+model Book {
+  id               Int      @id @default(autoincrement())
+  title            String
+  isbn             String   @unique
+  pageCount        Int
+  publishedDate    DateTime
+  thumbnailUrl     String
+  shortDescription String
+  longDescription  String
+  status           String
+  authors          Author[]
+  categories       Category[]
+  userBookStatus   UserBookStatus[]
+  bookRatings      BookRating[]
+  // Add any other fields you need.
+}
+
+model Author {
+  id   Int    @id @default(autoincrement())
+  name String
+  // Add other Author fields as needed.
+}
+
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+  // Add other Category fields as needed.
+}
+
+
+model UserBookStatus {
+  id              Int     @id @default(autoincrement())
+  currentlyReading Boolean
+  wantToRead      Boolean
+  user            User
+  book            Book
+  // Add any other fields as needed.
+}
+
+
+model BookRating {
+  id       Int     @id @default(autoincrement())
+  rating   Int
+  comment  String?
+  timestamp DateTime
+  user     User
+  book     Book
+  // Add any other fields as needed.
+}
+
+model UserProfile {
+  id            Int      @id @default(autoincrement())
+  full_name     String
+  profile_image String?
+  user          User @relation(fields: [user_id], references: [id])
+  user_id       Int
+  // Add any other fields as needed.
+}
+
+
+
