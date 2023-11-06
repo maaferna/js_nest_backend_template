@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,17 +7,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-// schema.prisma
-
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String
-  email     String
-  profile   UserProfile?
-  // Add other User fields as needed.
+  id              Int      @id @default(autoincrement())
+  username        String
+  email           String
+  hash            String
+  profile         UserProfile?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
+model UserProfile {
+  id            Int      @id @default(autoincrement())
+  first_name     String?
+  last_name     String?
+  profile_image String?
+  biography      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Define a one-to-one relation with User
+  user User @relation(fields: [user_id], references: [id])
+  user_id Int @unique
+}
+
+
+model Author {
+  id    Int      @id @default(autoincrement())
+  name  String
+  books Book[]   @relation("BookToAuthors")
+}
+
+model Category {
+  id       Int      @id @default(autoincrement())
+  name     String
+  books    Book[]   @relation("BookToCategories")
+}
 
 model Book {
   id               Int      @id @default(autoincrement())
@@ -32,55 +54,10 @@ model Book {
   shortDescription String
   longDescription  String
   status           String
-  authors          Author[]
-  categories       Category[]
-  userBookStatus   UserBookStatus[]
-  bookRatings      BookRating[]
-  // Add any other fields you need.
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  authors    Author[]   @relation("BookToAuthors")
+  categories Category[] @relation("BookToCategories")
 }
-
-model Author {
-  id   Int    @id @default(autoincrement())
-  name String
-  // Add other Author fields as needed.
-}
-
-
-model Category {
-  id   Int    @id @default(autoincrement())
-  name String
-  // Add other Category fields as needed.
-}
-
-
-model UserBookStatus {
-  id              Int     @id @default(autoincrement())
-  currentlyReading Boolean
-  wantToRead      Boolean
-  user            User
-  book            Book
-  // Add any other fields as needed.
-}
-
-
-model BookRating {
-  id       Int     @id @default(autoincrement())
-  rating   Int
-  comment  String?
-  timestamp DateTime
-  user     User
-  book     Book
-  // Add any other fields as needed.
-}
-
-model UserProfile {
-  id            Int      @id @default(autoincrement())
-  full_name     String
-  profile_image String?
-  user          User @relation(fields: [user_id], references: [id])
-  user_id       Int
-  // Add any other fields as needed.
-}
-
-
 
