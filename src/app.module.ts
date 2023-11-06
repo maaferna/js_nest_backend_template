@@ -7,8 +7,9 @@ import { CategoryModule } from './category/category.module';
 import { UserBookStatusModule } from './user_book_status/user_book_status.module';
 import { BookReviewModule } from './book_review/book_review.module';
 import { UserProfileModule } from './user_profile/user_profile.module';
+import { DatabaseConnectionModule } from './database_connection/database_connection.module';
 
 @Module({
-  imports: [AuthModule, UserModule, BookModule, AuthorModule, CategoryModule, UserBookStatusModule, BookReviewModule, UserProfileModule],
+  imports: [AuthModule, UserModule, BookModule, AuthorModule, CategoryModule, UserBookStatusModule, BookReviewModule, UserProfileModule, DatabaseConnectionModule],
 })
 export class AppModule {}
