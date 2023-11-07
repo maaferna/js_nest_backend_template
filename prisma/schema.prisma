@@ -10,11 +10,13 @@ datasource db {
 model User {
   id              Int      @id @default(autoincrement())
   username        String
-  email           String
+  email           String @unique
   hash            String
   profile         UserProfile?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  @@map("users")
 }
 
 model UserProfile {
@@ -29,6 +31,7 @@ model UserProfile {
   // Define a one-to-one relation with User
   user User @relation(fields: [user_id], references: [id])
   user_id Int @unique
+  @@map("Users_to_Profile")
 }
 
 
@@ -36,12 +39,14 @@ model Author {
   id    Int      @id @default(autoincrement())
   name  String
   books Book[]   @relation("BookToAuthors")
+  @@map("authors")
 }
 
 model Category {
   id       Int      @id @default(autoincrement())
   name     String
   books    Book[]   @relation("BookToCategories")
+  @@map("categories")
 }
 
 model Book {
@@ -59,5 +64,7 @@ model Book {
 
   authors    Author[]   @relation("BookToAuthors")
   categories Category[] @relation("BookToCategories")
+    
+  @@map("books")
 }
 
