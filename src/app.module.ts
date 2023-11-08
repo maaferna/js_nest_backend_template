@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { BookModule } from './book/books.module';
@@ -10,6 +11,19 @@ import { UserProfileModule } from './user_profile/user_profile.module';
 import { DatabaseConnectionModule } from './database_connection/database_connection.module';
 
 @Module({
-  imports: [AuthModule, UserModule, BookModule, AuthorModule, CategoryModule, UserBookStatusModule, BookReviewModule, UserProfileModule, DatabaseConnectionModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    AuthModule,
+    UserModule,
+    BookModule,
+    AuthorModule,
+    CategoryModule,
+    UserBookStatusModule,
+    BookReviewModule,
+    UserProfileModule,
+    DatabaseConnectionModule,
+  ],
 })
 export class AppModule {}
