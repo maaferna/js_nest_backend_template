@@ -10,5 +10,15 @@ services:
       POSTGRES_DB: nest
     networks:
       - mparraf
+  test-db:
+    image: postgres:13
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: claveadmin
+      POSTGRES_DB: nest
+    networks:
+      - mparraf
 networks:
   mparraf:

@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, Post } from '@nestjs/common';
-import { DatabaseConnectionService } from 'src/database_connection/database_connection.service';
+import { DatabaseConnectionService } from '../database_connection/database_connection.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { error } from 'console';
