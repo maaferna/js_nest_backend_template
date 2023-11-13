@@ -8,7 +8,6 @@ import { AuthDto, UserProfileDto } from '@app/auth/dto';
 import * as argon from 'argon2';
 import { ForbiddenException } from '@nestjs/common';
 import { AuthService } from '../src/auth/auth.service';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 jest.mock('argon2');
 
@@ -34,6 +33,7 @@ describe('App e2e', () => {
     await prisma.cleanDb();
     pactum.request.setBaseUrl('http://localhost:3333');
     authService = moduleRef.get<AuthService>(AuthService);
+
     prismaMock = {
       user: {
         create: jest.fn(),
@@ -83,7 +83,80 @@ describe('App e2e', () => {
       });
     });
     describe('Signin', () => {
-      it.todo('should signin');
+      it('should sign in the user and return access token', async () => {
+        const mockUser = {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          hash: 'hashedPassword',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const mockAuthDto = {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          password: 'testpassword',
+          profile: {
+            id: 1,
+            first_name: 'Marco',
+            last_name: 'Parra',
+            profile_image: '/path/to/image',
+            biography: 'Some text',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        const mockSignTokenResult = { access_token: 'mockAccessToken' };
+
+        jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+        jest.spyOn(argon, 'verify').mockResolvedValue(true);
+        jest
+          .spyOn(authService, 'signToken')
+          .mockResolvedValue(mockSignTokenResult);
+
+        const result = await authService.signin(mockAuthDto);
+
+        expect(result).toEqual(mockSignTokenResult);
+      });
+      it('should throw ForbiddenException if password is incorrect', async () => {
+        const mockUser = {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          hash: 'hashedPassword',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const mockAuthDto = {
+          id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          password: 'testpassword',
+          profile: {
+            id: 1,
+            first_name: 'Marco',
+            last_name: 'Parra',
+            profile_image: '/path/to/image',
+            biography: 'Some text',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+        jest.spyOn(argon, 'verify').mockResolvedValue(false);
+
+        await expect(authService.signin(mockAuthDto)).rejects.toThrowError(
+          ForbiddenException,
+        );
+      });
     });
   });
   describe('User', () => {

@@ -25,11 +25,9 @@ export class UserProfileDto {
   @IsString()
   biography?: string;
 
-  @IsString()
-  createdAt: string;
+  createdAt: any;
 
-  @IsString()
-  updatedAt: string;
+  updatedAt: any;
 }
 
 export class AuthDto {
@@ -51,9 +49,7 @@ export class AuthDto {
   @Type(() => UserProfileDto)
   profile: UserProfileDto | null;
 
-  @IsString()
-  createdAt: string;
+  createdAt: any;
 
-  @IsString()
-  updatedAt: string;
+  updatedAt: any;
 }
