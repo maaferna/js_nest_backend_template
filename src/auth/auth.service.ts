@@ -26,7 +26,7 @@ export class AuthService {
           username: dto.username,
           email: dto.email,
           hash,
-          profile: dto.profile,
+          profile: {},
           createdAt: dto.createdAt,
           updatedAt: dto.updatedAt,
         },

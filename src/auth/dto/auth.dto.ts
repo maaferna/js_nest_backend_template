@@ -9,8 +9,27 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class UserProfileDto {
-  // Define the structure of the UserProfile here if needed
+export class UserProfileDto {
+  @IsInt()
+  id?: number;
+
+  @IsString()
+  first_name?: string;
+
+  @IsString()
+  last_name?: string;
+
+  @IsString()
+  profile_image?: string;
+
+  @IsString()
+  biography?: string;
+
+  @IsString()
+  createdAt: string;
+
+  @IsString()
+  updatedAt: string;
 }
 
 export class AuthDto {
@@ -32,9 +51,9 @@ export class AuthDto {
   @Type(() => UserProfileDto)
   profile: UserProfileDto | null;
 
-  @IsDate()
-  createdAt: Date;
+  @IsString()
+  createdAt: string;
 
-  @IsDate()
-  updatedAt: Date;
+  @IsString()
+  updatedAt: string;
 }

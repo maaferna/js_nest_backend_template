@@ -29,9 +29,8 @@ model UserProfile {
   updatedAt DateTime @updatedAt
 
   // Define a one-to-one relation with User
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int @unique
-  @@map("Users_to_Profile")
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
 }
 
 

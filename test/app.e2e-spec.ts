@@ -4,11 +4,19 @@ import { INestApplication, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { DatabaseConnectionService } from '../src/database_connection/database_connection.service';
 import { get } from 'http';
 import * as pactum from 'pactum';
-import { AuthDto } from '@app/auth/dto';
+import { AuthDto, UserProfileDto } from '@app/auth/dto';
 import * as argon from 'argon2';
+import { ForbiddenException } from '@nestjs/common';
+import { AuthService } from '../src/auth/auth.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+
+jest.mock('argon2');
+
 describe('App e2e', () => {
   let app: INestApplication;
   let prisma: DatabaseConnectionService;
+  let authService: AuthService;
+  let prismaMock: any;
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
@@ -24,30 +32,54 @@ describe('App e2e', () => {
     await app.listen(3333);
     prisma = app.get(DatabaseConnectionService);
     await prisma.cleanDb();
+    pactum.request.setBaseUrl('http://localhost:3333');
+    authService = moduleRef.get<AuthService>(AuthService);
+    prismaMock = {
+      user: {
+        create: jest.fn(),
+      },
+    };
   });
   afterAll(() => {
     app.close();
   });
+
   describe('Auth', () => {
     describe('Signup', () => {
       it('should signup', async () => {
-        // Define the DTO for signup
-        const dto: AuthDto = {
+        // Send a POST request to the signup endpoint with the provided
+        // Define the DTO for sign functions
+        const mockHash = 'mockedHashValue';
+        (argon.hash as jest.Mock).mockResolvedValue(mockHash);
+        const signupDto: AuthDto = {
           id: 1,
-          username: 'usertest',
-          email: 'test@gmail.com',
-          password: 'passwordtesting',
-          profile: null,
-          createdAt: new Date(), // Should be a Date instance
-          updatedAt: new Date(), // Should be a Date instance
+          username: 'testuser',
+          email: 'test@example.com',
+          password: 'testpassword',
+          profile: {
+            id: 1,
+            first_name: 'Marco',
+            last_name: 'Parra',
+            profile_image: '/path/to/image',
+            biography: 'Some text',
+            createdAt: '2023-11-13T15:48:40.280Z',
+            updatedAt: '2023-11-13T15:48:40.280Z',
+          }, // Setting profile to null
+          createdAt: '2023-11-13T15:48:40.280Z',
+          updatedAt: '2023-11-13T15:48:40.280Z',
         };
-
-        // Send a POST request to the signup endpoint with the provided DTO
+        prismaMock.user.create.mockResolvedValue({
+          id: 1,
+          email: signupDto.email,
+          username: signupDto.username,
+          createdAt: signupDto.createdAt,
+        });
         return pactum
           .spec()
-          .post('http://localhost:3333/auth/signup')
-          .withBody(dto)
-          .expectStatus(201).toss;
+          .post('/auth/signup')
+          .withBody(signupDto)
+          .expectStatus(201)
+          .inspect();
       });
     });
     describe('Signin', () => {
@@ -79,7 +111,3 @@ describe('App e2e', () => {
   });
   it.todo('should pass');
 });
-function now(): Date {
-  throw new Error('Function not implemented.');
-}
-

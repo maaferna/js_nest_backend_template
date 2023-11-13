@@ -13,10 +13,16 @@ export class DatabaseConnectionService extends PrismaClient {
       },
     });
   }
-  cleanDb() {
-    return this.$transaction([
-      this.userProfile.deleteMany(),
-      this.user.deleteMany(),
-    ]);
+  async cleanDb() {
+    try {
+      await this.$transaction([
+        this.userProfile.deleteMany(),
+        this.user.deleteMany(),
+      ]);
+      console.log('Database cleaned successfully.');
+    } catch (error) {
+      console.error('Error cleaning the database:', error.message);
+      throw error; // Rethrow the error to propagate it up the call stack
+    }
   }
 }
