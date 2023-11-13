@@ -8,6 +8,7 @@ import { AuthDto, UserProfileDto } from '@app/auth/dto';
 import * as argon from 'argon2';
 import { ForbiddenException } from '@nestjs/common';
 import { AuthService } from '../src/auth/auth.service';
+import { EditUserDto } from '@app/user/dto';
 
 jest.mock('argon2');
 
@@ -79,7 +80,6 @@ describe('App e2e', () => {
           .post('/auth/signup')
           .withBody(signupDto)
           .expectStatus(201)
-          .inspect()
           .stores('userAt', 'access_token');
       });
     });
@@ -169,11 +169,26 @@ describe('App e2e', () => {
           .withHeaders({
             Authorization: 'Bearer $S{userAt}',
           })
-          .expectStatus(200)
-          .inspect();
+          .expectStatus(200);
       });
     });
-    describe('Edit user', () => {});
+    describe('Edit user', () => {
+      it('should edit user', () => {
+        const userId = 1;
+        const dto: EditUserDto = {
+          id: Number(userId),
+          username: 'Marco Antonio',
+        };
+        return pactum
+          .spec()
+          .patch(`/users/${userId}`) // Include the user ID in the URL
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .withBody(dto)
+          .expectStatus(200);
+      });
+    });
   });
   describe('Author', () => {
     describe('Create author', () => {});
