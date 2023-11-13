@@ -79,7 +79,8 @@ describe('App e2e', () => {
           .post('/auth/signup')
           .withBody(signupDto)
           .expectStatus(201)
-          .inspect();
+          .inspect()
+          .stores('userAt', 'access_token');
       });
     });
     describe('Signin', () => {
@@ -160,7 +161,18 @@ describe('App e2e', () => {
     });
   });
   describe('User', () => {
-    describe('Get current user', () => {});
+    describe('Get current user', () => {
+      it('should get the current user', () => {
+        return pactum
+          .spec()
+          .get('/users/me')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200)
+          .inspect();
+      });
+    });
     describe('Edit user', () => {});
   });
   describe('Author', () => {
