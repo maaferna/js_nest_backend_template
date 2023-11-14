@@ -14,7 +14,7 @@ import { GetUser } from '@app/auth/decorator';
 import { CreateBookDto } from './dto/create-book.dto';
 
 @UseGuards(JwtGuard)
-@Controller('book')
+@Controller('books')
 export class BookController {
   constructor(private bookService: BookService) {}
   @Post()

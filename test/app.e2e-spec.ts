@@ -8,7 +8,8 @@ import { AuthDto, UserProfileDto } from '@app/auth/dto';
 import * as argon from 'argon2';
 import { ForbiddenException } from '@nestjs/common';
 import { AuthService } from '../src/auth/auth.service';
-import { EditUserDto } from '@app/user/dto';
+import { EditUserDto } from '../src/user/dto';
+import { CreateBookDto } from '../src/book/dto';
 
 jest.mock('argon2');
 
@@ -245,7 +246,92 @@ describe('App e2e', () => {
     describe('Get category', () => {});
   });
   describe('Book', () => {
-    describe('Create book', () => {});
+    describe('Create book', () => {
+      it('should create two books with authors and categories', async () => {
+        const authHeaders = {
+          Authorization: 'Bearer $S{userAt}',
+        };
+
+        // Create an author
+        const createAuthorDto = {
+          name: 'John Doe Jr',
+        };
+        const authorResponse = await pactum
+          .spec()
+          .post('/authors')
+          .withJson(createAuthorDto)
+          .withHeaders(authHeaders)
+          .expectStatus(201);
+
+        const author2Id = authorResponse.body.id;
+        const authorId = 1;
+        // Create categories
+        const category1Dto = {
+          name: 'Category 3',
+        };
+        const category2Dto = {
+          name: 'Category 4',
+        };
+
+        const category1Response = await pactum
+          .spec()
+          .post('/categories')
+          .withHeaders(authHeaders)
+          .withJson(category1Dto)
+          .expectStatus(201);
+
+        const category2Response = await pactum
+          .spec()
+          .post('/categories')
+          .withHeaders(authHeaders)
+          .withJson(category2Dto)
+          .expectStatus(201);
+
+        const categoryIds = [
+          category1Response.body.id,
+          category2Response.body.id,
+        ];
+
+        // Create books with authors and categories
+        const book1Dto = new CreateBookDto();
+        book1Dto.title = 'Book 1';
+        book1Dto.isbn = '1244567890';
+        book1Dto.pageCount = 200;
+        book1Dto.publishedDate = '2023-11-15T12:00:00Z';
+        book1Dto.thumbnailUrl = 'https://example.com/book1-thumbnail';
+        book1Dto.shortDescription = 'Short description for Book 1';
+        book1Dto.longDescription = 'Long description for Book 1';
+        book1Dto.status = 'Available';
+        book1Dto.authors = [1]; // Replace with valid author IDs
+        book1Dto.categories = [1, 2, 3]; // Replace with valid category IDs
+
+        const book2Dto = new CreateBookDto();
+        book2Dto.title = 'Book 2';
+        book2Dto.isbn = '0947654321';
+        book2Dto.pageCount = 150;
+        book2Dto.publishedDate = '2023-11-16T12:00:00Z';
+        book2Dto.thumbnailUrl = 'https://example.com/book2-thumbnail';
+        book2Dto.shortDescription = 'Short description for Book 2';
+        book2Dto.longDescription = 'Long description for Book 2';
+        book2Dto.status = 'Available';
+        book2Dto.authors = [1, 2]; // Replace with valid author IDs
+        book2Dto.categories = [3, 4]; // Replace with valid category IDs
+
+        await pactum
+          .spec()
+          .post('/books')
+          .withHeaders(authHeaders)
+          .withJson(book1Dto)
+          .expectStatus(201);
+
+        await pactum
+          .spec()
+          .post('/books')
+          .withHeaders(authHeaders)
+          .withJson(book2Dto)
+          .expectStatus(201);
+      });
+    });
     describe('Get book by id', () => {});
     describe('Edit book', () => {});
     describe('Delete book', () => {});

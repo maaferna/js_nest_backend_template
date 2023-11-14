@@ -23,9 +23,8 @@ export class CreateBookDto {
   @IsNotEmpty()
   pageCount: number;
 
-  @IsDate()
   @IsNotEmpty()
-  publishedDate: Date;
+  publishedDate: any;
 
   @IsString()
   @IsNotEmpty()
@@ -43,13 +42,9 @@ export class CreateBookDto {
 
   @IsArray()
   @ArrayNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Number) // Assuming author IDs are numbers
   authors: number[]; // Array of author IDs
 
   @IsArray()
   @ArrayNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Number) // Assuming category IDs are numbers
   categories: number[]; // Array of category IDs
 }
