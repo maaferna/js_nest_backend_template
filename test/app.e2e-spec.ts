@@ -191,11 +191,57 @@ describe('App e2e', () => {
     });
   });
   describe('Author', () => {
-    describe('Create author', () => {});
+    describe('Create author', () => {
+      it('should create an author', async () => {
+        const createAuthorDto = {
+          name: 'John Doe',
+        };
+        return pactum
+          .spec()
+          .post('/authors')
+          .withJson(createAuthorDto)
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(201);
+      });
+    });
     describe('Get author', () => {});
   });
   describe('Category', () => {
-    describe('Create category', () => {});
+    describe('Create category', () => {
+      it('should create two categories', async () => {
+        // Assuming you have a valid authentication token in userAt
+        const authHeaders = {
+          Authorization: 'Bearer $S{userAt}',
+        };
+
+        // Define DTOs for creating categories
+        const category1Dto = {
+          name: 'Category 1',
+        };
+
+        const category2Dto = {
+          name: 'Category 2',
+        };
+
+        // Create the first category
+        await pactum
+          .spec()
+          .post('/categories')
+          .withHeaders(authHeaders)
+          .withJson(category1Dto)
+          .expectStatus(201);
+
+        // Create the second category
+        await pactum
+          .spec()
+          .post('/categories')
+          .withHeaders(authHeaders)
+          .withJson(category2Dto)
+          .expectStatus(201);
+      });
+    });
     describe('Get category', () => {});
   });
   describe('Book', () => {
