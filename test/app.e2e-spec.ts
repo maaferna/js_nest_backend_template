@@ -332,7 +332,48 @@ describe('App e2e', () => {
           .expectStatus(201);
       });
     });
-    describe('Get book by id', () => {});
+    describe('Get book by id', () => {
+      it('should get a book by id', async () => {
+        // Assume you have an existing book ID
+        const existingBookId = 1;
+
+        // Fetch the book from the database
+        const existingBook = await prisma.book.findUnique({
+          where: { id: existingBookId },
+          include: {
+            authors: true,
+            categories: true,
+          },
+        });
+
+        // Convert date objects to strings for comparison
+        const expectedBook = JSON.parse(JSON.stringify(existingBook));
+        console.log(expectedBook);
+
+        // Make the request using the existing book ID and compare with the actual book data
+        await pactum
+          .spec()
+          .get(`/books/${existingBookId}`)
+          .expectStatus(200)
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectJson(expectedBook as any); // Replace this with your assertion logic
+      });
+
+      it('should handle not found book by id', async () => {
+        const nonExistentBookId = 999;
+
+        // Make the request using a non-existent book ID
+        await pactum
+          .spec()
+          .get(`/books/${nonExistentBookId}`)
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(404);
+      });
+    });
     describe('Edit book', () => {});
     describe('Delete book', () => {});
   });
