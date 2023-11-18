@@ -21,8 +21,11 @@ export class DatabaseConnectionService extends PrismaClient {
       ]);
       console.log('Database cleaned successfully.');
     } catch (error) {
-      console.error('Error cleaning the database:', error.message);
-      throw error; // Rethrow the error to propagate it up the call stack
+      if (error instanceof Error && error.message) {
+        console.error('Error cleaning the database:', error.message);
+      } else {
+        console.error('An unknown error occurred while cleaning the database.');
+      }
     }
   }
 }

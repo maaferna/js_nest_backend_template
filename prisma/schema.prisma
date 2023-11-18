@@ -36,14 +36,14 @@ model UserProfile {
 
 model Author {
   id    Int      @id @default(autoincrement())
-  name  String
+  name  String @unique
   books Book[]   @relation("BookToAuthors")
   @@map("authors")
 }
 
 model Category {
   id       Int      @id @default(autoincrement())
-  name     String
+  name     String @unique
   books    Book[]   @relation("BookToCategories")
   @@map("categories")
 }

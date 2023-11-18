@@ -19,6 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/*": ["*"]
-    }
+    },
+    "strict": true
   }
 }
