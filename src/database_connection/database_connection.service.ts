@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class DatabaseConnectionService extends PrismaClient {
+  userBookStatus: any;
   constructor(config: ConfigService) {
     super({
       datasources: {

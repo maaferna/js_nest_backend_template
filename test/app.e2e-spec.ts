@@ -10,6 +10,8 @@ import { ForbiddenException } from '@nestjs/common';
 import { AuthService } from '../src/auth/auth.service';
 import { EditUserDto } from '../src/user/dto';
 import { CreateBookDto } from '../src/book/dto';
+import { CreateBookStatusDto } from '../src/user_book_status/dto/create-book-status.dto';
+import { UserBookStatusService } from '../src/user_book_status/user_book_status.service';
 
 jest.mock('argon2');
 
@@ -382,5 +384,53 @@ describe('App e2e', () => {
     describe('Get profile', () => {});
     describe('Edit profile', () => {});
   });
-  it.todo('should pass');
+  describe('BookStatus API Tests', () => {
+    describe('Create BookStatus', () => {
+      it('should create a book status for a user', async () => {
+        const userId = 1; // replace with a valid user ID
+        const createBookStatusDto: CreateBookStatusDto = {
+          bookId: 1, // replace with a valid book ID
+          wantToRead: true,
+          currentlyRead: false,
+        };
+        console.log('Test - createBookStatusDto:', createBookStatusDto);
+
+        // Add log statements before Pactum request setup
+        console.log('Before Pactum Request Setup');
+
+        // Wrap Pactum setup in a Promise
+        await new Promise<void>((resolve) => {
+          pactum
+            .spec()
+            .post(`/users/${userId}/book-statuses`)
+            .withHeaders({
+              Authorization: 'Bearer $S{userAt}',
+            })
+            .withJson(createBookStatusDto)
+            .expectStatus(201)
+            .toss();
+
+          // Add a timeout to ensure the logs are printed after the Pactum request setup
+          setTimeout(() => {
+            console.log('After Pactum Request Setup');
+            resolve();
+          }, 0);
+        });
+      });
+
+      describe('Get BookStatus', () => {
+        it('should get book statuses for a user', () => {
+          const userId = 1; // replace with a valid user ID
+
+          return pactum
+            .spec()
+            .get(`/users/${userId}/book-statuses`)
+            .withHeaders({
+              Authorization: 'Bearer $S{userAt}',
+            })
+            .expectStatus(200);
+        });
+      });
+    });
+  });
 });

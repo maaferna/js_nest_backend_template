@@ -77,8 +77,6 @@ model BookStatus {
   id        Int      @id @default(autoincrement())
   wantToRead Boolean
   currentlyRead Boolean
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   // Define a many-to-one relation with User
   user User @relation(fields: [userId], references: [id])
@@ -86,6 +84,9 @@ model BookStatus {
   // Define a many-to-one relation with Book
   book Book @relation(fields: [bookId], references: [id])
   bookId Int
+
+  @@unique([userId, bookId], name: "UserIdBookIdUniqueConstraint")
+
 
   @@map("book_statuses")
 }

@@ -24,6 +24,7 @@ import { DatabaseConnectionModule } from './database_connection/database_connect
     BookReviewModule,
     UserProfileModule,
     DatabaseConnectionModule,
+    UserBookStatusModule,
   ],
 })
 export class AppModule {}
