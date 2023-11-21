@@ -42,14 +42,23 @@ export class UserBookStatusService {
     // Check if the user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
+      include: {
+        bookStatuses: true, // Include the user's book statuses
+      },
     });
+
+    console.log('*****************', user);
+
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    // Retrieve all book statuses for the user
-    return this.prisma.userBookStatus.findMany({
-      where: { userId },
-    });
+    // Access all instances of BookStatus for the user
+    const bookStatuses = user.bookStatuses;
+
+    // Optionally, you can log the bookStatuses
+    console.log('*****************', bookStatuses);
+
+    return bookStatuses;
   }
 }

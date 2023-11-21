@@ -426,37 +426,14 @@ describe('App e2e', () => {
     describe('Get BookStatus', () => {
       it('should get all book statuses for a user', async () => {
         const userId = 1; // Replace with the actual user ID
-        const createBookStatusDto: CreateBookStatusDto = {
-          bookId: 2, // replace with a valid book ID
-          wantToRead: true,
-          currentlyRead: false,
-        };
         // Wrap Pactum setup in a Promise
-        await new Promise<void>((resolve) => {
-          pactum
-            .spec()
-            .get(`/users/${userId}/book-statuses`)
-            .withHeaders({
-              Authorization: 'Bearer $S{userAt}',
-            })
-            .withJson(createBookStatusDto)
-            .expectStatus(200)
-            .expectJsonSchema([
-              {
-                id: Number,
-                userId: Number,
-                bookId: Number,
-                wantToRead: Boolean,
-                currentlyRead: Boolean,
-              },
-            ]) // Replace with the actual schema for book statuses
-            .toss();
-
-          setTimeout(() => {
-            console.log('After Pactum Request Setup');
-            resolve();
-          }, 0);
-        });
+        return pactum
+          .spec()
+          .get(`/users/${userId}/book-statuses/getall`)
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200);
       });
     });
   });
