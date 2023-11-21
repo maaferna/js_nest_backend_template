@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { INestApplication, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { DatabaseConnectionService } from '../src/database_connection/database_connection.service';
@@ -6,12 +6,13 @@ import { get } from 'http';
 import * as pactum from 'pactum';
 import { AuthDto, UserProfileDto } from '@app/auth/dto';
 import * as argon from 'argon2';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AuthService } from '../src/auth/auth.service';
 import { EditUserDto } from '../src/user/dto';
 import { CreateBookDto } from '../src/book/dto';
 import { CreateBookStatusDto } from '../src/user_book_status/dto/create-book-status.dto';
 import { UserBookStatusService } from '../src/user_book_status/user_book_status.service';
+import { response } from 'express';
 
 jest.mock('argon2');
 
@@ -45,6 +46,8 @@ describe('App e2e', () => {
     };
   });
   afterAll(() => {
+    // Reset mocks after each test
+    jest.clearAllMocks();
     app.close();
   });
 
@@ -417,18 +420,42 @@ describe('App e2e', () => {
           }, 0);
         });
       });
-
-      describe('Get BookStatus', () => {
-        it('should get book statuses for a user', () => {
-          const userId = 1; // replace with a valid user ID
-
-          return pactum
+    });
+  });
+  describe('BookStatus API Tests 2', () => {
+    describe('Get BookStatus', () => {
+      it('should get all book statuses for a user', async () => {
+        const userId = 1; // Replace with the actual user ID
+        const createBookStatusDto: CreateBookStatusDto = {
+          bookId: 2, // replace with a valid book ID
+          wantToRead: true,
+          currentlyRead: false,
+        };
+        // Wrap Pactum setup in a Promise
+        await new Promise<void>((resolve) => {
+          pactum
             .spec()
             .get(`/users/${userId}/book-statuses`)
             .withHeaders({
               Authorization: 'Bearer $S{userAt}',
             })
-            .expectStatus(200);
+            .withJson(createBookStatusDto)
+            .expectStatus(200)
+            .expectJsonSchema([
+              {
+                id: Number,
+                userId: Number,
+                bookId: Number,
+                wantToRead: Boolean,
+                currentlyRead: Boolean,
+              },
+            ]) // Replace with the actual schema for book statuses
+            .toss();
+
+          setTimeout(() => {
+            console.log('After Pactum Request Setup');
+            resolve();
+          }, 0);
         });
       });
     });

@@ -12,12 +12,12 @@ import { UserBookStatusService } from './user_book_status.service';
 import { CreateBookStatusDto } from './dto/create-book-status.dto';
 import { JwtGuard } from '../auth/guard';
 
-@Controller('users/:userId/book-statuses')
+@Controller()
 export class UserBookStatusController {
   constructor(private readonly userBookStatusService: UserBookStatusService) {}
 
   @UseGuards(JwtGuard)
-  @Post()
+  @Post('users/:userId/book-statuses')
   create(
     @Param('userId', ParseIntPipe) userId: number,
     @Body() createBookStatusDto: CreateBookStatusDto,
@@ -26,7 +26,7 @@ export class UserBookStatusController {
   }
 
   @UseGuards(JwtGuard)
-  @Get()
+  @Get('users/:userId/book-statuses/getall')
   findAll(@Param('userId', ParseIntPipe) userId: number) {
     return this.userBookStatusService.findAllByUserId(userId);
   }
